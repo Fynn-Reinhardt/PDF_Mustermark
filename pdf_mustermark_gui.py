@@ -39,13 +39,12 @@ def mark(f_in, f_out, reg):
 
 
 root = tk.Tk()
-root.title("PDF Mustersuche")
+root.title("PDF Mustermark")
 
 frame = ttk.Frame(root, padding="10")
 frame.grid(column=0, row=0, sticky="nsew")
 
 file_in = tk.StringVar()
-file_in.set("/home/flynn/Downloads/neubeck.pdf")
 file_in_entry = ttk.Entry(frame, textvariable=file_in)
 file_in_entry.grid(column=1, row=0, sticky="we", padx=5, pady=5)
 
@@ -56,7 +55,6 @@ regex_entry.grid(column=1, row=1, sticky="we", columnspan=2,
                  padx=5, pady=5)
 
 file_out = tk.StringVar()
-file_out.set("/home/flynn/Documents/tmp/PDF_Mustersuche/neubeck_out.pdf")
 file_out_entry = ttk.Entry(frame, textvariable=file_out)
 file_out_entry.grid(column=1, row=2, sticky="we", padx=5, pady=5)
 
