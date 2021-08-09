@@ -8,6 +8,30 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 
+import threading
+import time
+
+
+# Class for the thread that the most intensive processing work will
+# be done in, so the UI stays snappy (even though it will be hidden behind
+# a loading screen for the duration of the process)
+class runThread (threading.Thread):
+    def __init__(self, pdfmu, reg, f_out, loading_frame, frame):
+        threading.Thread.__init__(self)
+        self.pdfmu = pdfmu
+        self.reg = reg
+        self.f_out = f_out
+        self.loading_frame = loading_frame
+        self.frame = frame
+    def run(self):
+        print("Start")
+        self.pdfmu.mark_document(self.reg)
+        self.pdfmu.save_close(self.f_out)
+        print("Done")
+        
+        self.loading_frame.grid_forget()
+        self.frame.grid(column=0, row=0, sticky="nsew")
+
 
 def mark(f_in, f_out, reg):
     try:
@@ -17,7 +41,7 @@ def mark(f_in, f_out, reg):
             title="Input-Datei Error",
             message='Die Datei konnte nicht geöffnet werden.'
             )
-        print("Error ):<")  # Show another error message
+        print("Error >:(")  # Show another error message
         return None  # Exit function, 'return' alone would also work
 
     # Test run to check if the file can save before starting a potentially
@@ -30,12 +54,25 @@ def mark(f_in, f_out, reg):
             message=
             'Die Datei konnte nicht an dieser Stelle gespeichert werden.'
             )
-        print("Error ):<")  # Show another error message
+        print("Error >:(")  # Show another error message
         return None  # Exit function, 'return' alone would also work
 
-    pdfmu.mark_document(reg)
-    pdfmu.save_close(f_out)
-    print("Done")
+    # get dimensions of window contents
+    w = frame.winfo_width()
+    h = frame.winfo_height()
+
+    frame.grid_remove()  # Hides UI while the program is working
+    # loading screen
+    loading_frame = ttk.Frame(root, padding="10")
+    loading_frame.grid(column=0, row=0, sticky="nsew")
+    loading_label = ttk.Label(loading_frame, text="Arbeitet...")
+    loading_label.grid(column=0, row=0, sticky="nsew")
+    # set size of loading screen to be identical to the previous window
+    loading_frame.config(pad=((w-loading_label.winfo_reqwidth())/2,
+                              (h-loading_label.winfo_reqheight())/2))
+
+    newthread = runThread(pdfmu, reg, f_out, loading_frame, frame)
+    newthread.start()
 
 
 root = tk.Tk()
